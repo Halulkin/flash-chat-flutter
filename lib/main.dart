@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flash/screens/chat_screen.dart';
 import 'package:flash/screens/registration_screen.dart';
 import 'package:flash/screens/welcome_screen.dart';
@@ -5,18 +6,21 @@ import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
 
-void main() => runApp(FlashChat());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(FlashChat());
+}
 
 class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData.dark().copyWith(
-          textTheme: TextTheme(
-            bodyText2: TextStyle(color: Colors.black54),
-          ),
-          primaryTextTheme:
-              TextTheme(headline6: TextStyle(color: Colors.black))),
+        textTheme: TextTheme(
+          bodyText2: TextStyle(color: Colors.black54),
+        ),
+      ),
       initialRoute: WelcomeScreen.id,
       routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(),

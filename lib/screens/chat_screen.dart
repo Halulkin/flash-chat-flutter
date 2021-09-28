@@ -17,7 +17,6 @@ class _ChatScreenState extends State<ChatScreen> {
   late User loggedUser;
   late String messageText;
 
-
   @override
   void initState() {
     super.initState();
@@ -46,14 +45,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void messagesStream() async {
     await for (var snapshot in _fireStore.collection('messages').snapshots())
-    for (var message in snapshot.docs) {
-      print(message.data());
-    }
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
@@ -71,6 +71,28 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+              stream: _fireStore.collection('messages').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                          backgroundColor: Colors.lightBlueAccent));
+                }
+                final messages = snapshot.data!.docs;
+                List<Text> messageWidgets = [];
+                for (var message in messages) {
+                  final messageText = message['text'];
+                  final messageSender = message['sender'];
+                  final messageWidget =
+                      Text('$messageText from $messageSender');
+                  messageWidgets.add(messageWidget);
+                }
+                return Column(
+                  children: messageWidgets,
+                );
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -78,6 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       onChanged: (value) {
                         messageText = value;
                       },
